@@ -1,0 +1,20 @@
+powerling:
+    configuration:
+        tab:
+            label: Powerling
+        link:
+            label: Go to Powerling
+        api_key:
+            label: API key
+        attributes:
+            label: Attributes
+        autolaunch:
+            label: Autolaunch project
+        section:
+            credentials: Credentials
+            settings: Settings
+
+    mass_edit:
+        product:
+            title: Translate with Powerling
+            description: Translate product data with Powerling

@@ -1,0 +1,28 @@
+pim_enrich:
+    mass_edit_action:
+        powerling_start_projects:
+            label: Translate products with Powerling
+            description: Create a new translation project in Powerling.
+            launched_flash: Now sending your products to the Powerling application.
+
+batch_jobs.powerling_start_projects:
+    powerling.step:
+        create_projects.label: Create projects in Powerling
+        add_documents.label: Add products to projects
+        send_projects.label: Send projects to Powerling
+
+powerling:
+    create_project:
+        label: Translate product data with Powerling
+    customer:
+        validation_link: The project arrived at Powerling and is now being processed
+        launched_link: The project arrived at Powerling and is now being processed
+    steps:
+        skipped_document.title: Skipped document
+
+job_execution.summary.projects_created: Created projects
+job_execution.summary.documents_added: Added documents
+job_execution.summary.projects_sent: Processed projects
+job_execution.summary.not_launched: Projects ready to launch
+job_execution.summary.link: Done
+job_execution.summary.memory_analysis: Memory analysis

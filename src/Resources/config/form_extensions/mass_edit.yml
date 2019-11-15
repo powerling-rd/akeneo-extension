@@ -1,0 +1,14 @@
+extensions:
+    powerling-mass-edit-configure:
+        module: powerling/mass_edit
+        parent: pim-mass-product-edit
+        position: 500
+        config:
+            title: powerling.mass_edit.product.title
+            label: powerling.mass_edit.product.title
+            labelCount: "{1}Translate <span class=\"AknFullPage-title--highlight\">1 product</span>|]1, Inf[Translate <span class=\"AknFullPage-title--highlight\">{{ itemsCount }} products</span>"
+            description: powerling.mass_edit.product.description
+            code: powerling_start_projects
+            jobInstanceCode: powerling_start_projects
+            icon: icon-template
+            illustration: attributes
