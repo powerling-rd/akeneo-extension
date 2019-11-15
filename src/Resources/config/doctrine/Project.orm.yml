@@ -1,0 +1,28 @@
+Pim\Bundle\PowerlingBundle\Entity\Project:
+    type: entity
+    table: powerling_project
+    repositoryClass: Pim\Bundle\PowerlingBundle\Project\ProjectRepository
+    changeTrackingPolicy: DEFERRED_EXPLICIT
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        code:
+            type: string
+            column: code
+        name:
+            type: string
+            column: name
+        langAssociationId:
+            type: string
+            column: lang_association_id
+        updatedAt:
+            type: datetime
+            column: updated_at
+            nullable: true
+        username:
+            type: string
+            column: username
+            nullable: true

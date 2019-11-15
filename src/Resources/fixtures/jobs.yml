@@ -1,0 +1,6 @@
+jobs:
+    powerling_create_projects:
+        connector: Powerling connector
+        alias:     powerling_create_projects
+        label:     'Start Powerling project'
+        type:      mass_edit

@@ -1,0 +1,44 @@
+<div class="AknFormContainer AknFormContainer--withPadding">
+    <img style="height: 80px; margin-bottom: 1em;"
+         src="/bundles/pimpowerling/img/Powerling.png"/>
+    <p><a href="https://powerling.com" target="_blank"><%- _.__('powerling.configuration.link.label') %></a></p>
+</div>
+
+<div class="AknSubsection">
+    <header class="AknSubsection-title">
+        <span class="group-label"><%- _.__('powerling.configuration.section.credentials') %></span>
+    </header>
+    <div class="AknFormContainer AknFormContainer--withPadding">
+        <div class="AknFieldContainer">
+            <div class="AknFieldContainer-header">
+                <label class="AknFieldContainer-label"
+                       for="pim_powerling___apikey"><%- _.__('powerling.configuration.api_key.label') %></label>
+            </div>
+            <div class="AknFieldContainer-inputContainer">
+                <input class="AknTextField texmaster-config"
+                       id="pim_powerling___apikey" name="pim_powerling___api_key"
+                       type="text" value="<%- apikey %>"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="AknSubsection">
+    <header class="AknSubsection-title">
+        <span class="group-label"><%- _.__('powerling.configuration.section.settings') %></span>
+    </header>
+    <div class="AknFormContainer AknFormContainer--withPadding">
+        <div class="AknFieldContainer">
+            <div class="AknFieldContainer-header">
+                <label class="AknFieldContainer-header"
+                       for="pim_powerling___attributes"><%- _.__('powerling.configuration.attributes.label')
+                    %></label>
+            </div>
+            <div class="AknFieldContainer-inputContainer">
+                <input class="texmaster-config select-field"
+                       id="pim_powerling___attributes" name="pim_powerling___attributes"
+                       type="hidden" value="<%- attributes %>"/>
+            </div>
+        </div>
+    </div>
+</div>

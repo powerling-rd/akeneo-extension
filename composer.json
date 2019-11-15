@@ -1,0 +1,32 @@
+{
+    "name": "powerling/akeneo-extension",
+    "type": "symfony-bundle",
+    "description": "Powerling extension for Akeneo product data",
+    "license": "OSL-3.0",
+    "authors": [
+        {"name": "Powerling", "homepage": "https://powerling.com"}
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/akeneo/pim-community-dev.git"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "ext-dom": "*",
+        "ext-json": "*",
+        "akeneo/pim-community-dev": "2.*",
+        "guzzlehttp/guzzle": "^6.4"
+    },
+    "require-dev": {
+        "behat/behat": "^3.1.0",
+        "friendsofphp/php-cs-fixer": "^2.8.2",
+        "phpspec/phpspec": "^2.5.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pim\\Bundle\\PowerlingBundle\\": "src/"
+        }
+    }
+}

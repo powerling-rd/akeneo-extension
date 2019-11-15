@@ -1,0 +1,4 @@
+powerling_rest_lang-associations:
+    path: /rest/lang-associations
+    defaults: { _controller: pim_powerling.controller.rest:fetchPowerlingLangAssociations }
+    methods: [GET]
