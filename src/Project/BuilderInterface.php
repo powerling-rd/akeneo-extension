@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\PowerlingBundle\Project;
 
-use Pim\Component\Catalog\Model\ProductInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ProductInterface;
 
 /**
  * Powerling builder.

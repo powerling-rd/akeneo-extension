@@ -16,11 +16,10 @@ class Project implements ProjectInterface
      */
     public function getDocumentsStatuses()
     {
-       # return $this->getProperty('documents_statuses');
+        # return $this->getProperty('documents_statuses');
     }
 
     public function getStatus()
     {
-
     }
 }

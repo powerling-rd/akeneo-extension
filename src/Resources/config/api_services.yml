@@ -1,5 +1,0 @@
-services:
-    pim_powerling.api.httpclient_factory:
-        class: Pim\Bundle\PowerlingBundle\Api\ClientFactory
-        arguments:
-            - '@oro_config.global'

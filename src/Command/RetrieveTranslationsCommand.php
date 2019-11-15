@@ -40,6 +40,7 @@ class RetrieveTranslationsCommand extends ContainerAwareCommand
         $this->writeMessage('Check Powerling projects');
 
         $pimProjects = $this->getPimProjects();
+
         foreach ($pimProjects as $project) {
             $this->writeMessage(sprintf('Update products for project %s', $project->getCode()));
             $this->updateProducts($project);
@@ -52,7 +53,7 @@ class RetrieveTranslationsCommand extends ContainerAwareCommand
      * @return ProjectInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function updateProducts(ProjectInterface $project)
+    protected function updateProducts(ProjectInterface $project): ProjectInterface
     {
         $webApiRepository = $this->getContainer()->get('pim_powerling.repository.webapi');
 

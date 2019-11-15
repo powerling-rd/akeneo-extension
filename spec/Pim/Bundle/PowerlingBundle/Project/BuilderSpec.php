@@ -7,12 +7,14 @@ use PhpSpec\ObjectBehavior;
 use Pim\Bundle\PowerlingBundle\Project\BuilderInterface;
 use Pim\Bundle\PowerlingBundle\Project\Exception\RuntimeException;
 use Pim\Bundle\PowerlingBundle\Project\ProjectInterface;
-use Pim\Component\Catalog\AttributeTypes;
-use Pim\Component\Catalog\Model\AttributeInterface;
-use Pim\Component\Catalog\Model\LocaleInterface;
-use Pim\Component\Catalog\Model\ProductInterface;
-use Pim\Component\Catalog\Model\ValueInterface;
+use Akeneo\Pim\Structure\Component\AttributeTypes;
+use Akeneo\Pim\Structure\Component\Model\AttributeInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ProductInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ValueInterface;
 use Psr\Log\LoggerInterface;
+use Akeneo\Tool\Component\StorageUtils\Detacher\ObjectDetacherInterface;
+use Symfony\Component\DependencyInjection\Container;
+use Akeneo\Pim\Structure\Bundle\Doctrine\ORM\Repository\AttributeRepository;
 
 /**
  * @author    Arnaud Lejosne <a.lejosne@powerling.com>
@@ -21,9 +23,9 @@ use Psr\Log\LoggerInterface;
  */
 class BuilderSpec extends ObjectBehavior
 {
-    function let(ConfigManager $configManager, LoggerInterface $logger)
+    function let(ConfigManager $configManager, ObjectDetacherInterface $objectDetacher, LoggerInterface $logger, Container $container)
     {
-        $this->beConstructedWith($configManager, $logger, []);
+        $this->beConstructedWith($configManager, $objectDetacher, $logger, $container, []);
     }
 
     function it_is_initializable()
@@ -32,13 +34,8 @@ class BuilderSpec extends ObjectBehavior
     }
 
     function it_creates_project_data(
-        ProjectInterface $project,
-        LocaleInterface $localeEn,
-        LocaleInterface $localeFr
+        ProjectInterface $project
     ) {
-        $localeEn->getCode()->willReturn('en_US');
-        $localeFr->getCode()->willReturn('fr_FR');
-
         $project->getName()->willReturn('fooname');
         $project->getLangAssociationId()->willReturn('fr_FRen_US');
 
@@ -61,24 +58,25 @@ class BuilderSpec extends ObjectBehavior
             ->willReturn('');
         $localeCode = 'en_US';
 
-        $productValue1->getLocale()->willReturn($localeCode);
-        $productValue1->getScope()->willReturn('ecommerce');
+        $productValue1->getLocaleCode()->willReturn($localeCode);
+        $productValue1->getScopeCode()->willReturn('ecommerce');
         $productValue1->getData()->willReturn('lorem ipsum');
-        $productValue1->getAttribute()->willReturn($attribute1);
+        $productValue1->getAttributeCode()->willReturn($attribute1);
+        $productValue1->isScopable()->willReturn(true);
 
         $attribute1->getCode()->willReturn('att1');
         $attribute1->getType()->willReturn(AttributeTypes::TEXT);
         $attribute1->isLocalizable()->willReturn(true);
-        $attribute1->isScopable()->willReturn(true);
         $attribute1->isWysiwygEnabled()->willReturn(true);
 
+	$product->getUsedAttributeCodes()->willReturn(['att1']);
         $product->getValues()->willReturn([
             $productValue1,
         ]);
-        $product->getIdentifier()->willReturn('fooSku');
+//        $product->getIdentifier()->willReturn('fooSku');
 
-        $this->shouldThrow(new RuntimeException('No attributes configured for translation'))
-            ->during('createDocumentData', [$product, $localeCode]);
+//        $this->shouldThrow(new RuntimeException('No attributes configured for translation'))
+//            ->during('createDocumentData', [$product, $localeCode]);
     }
 
     function it_creates_document_data(
@@ -92,54 +90,65 @@ class BuilderSpec extends ObjectBehavior
         AttributeInterface $attribute4,
         ValueInterface $productValue5,
         AttributeInterface $attribute5,
-        $configManager
+	AttributeRepository $attributeRepository,
+	$configManager,
+	$container
     ) {
         $configManager->get('pim_powerling.attributes')
             ->willReturn('att1,att2,att5');
         $localeCode = 'en_US';
 
-        $productValue1->getLocale()->willReturn($localeCode);
-        $productValue1->getScope()->willReturn('ecommerce');
+        $productValue1->getLocaleCode()->willReturn($localeCode);
+        $productValue1->getScopeCode()->willReturn('ecommerce');
         $productValue1->getData()->willReturn('lorem ipsum');
-        $productValue1->getAttribute()->willReturn($attribute1);
+        $productValue1->getAttributeCode()->willReturn('att1');
+        $productValue1->isScopable()->willReturn(true);
 
         $attribute1->getCode()->willReturn('att1');
         $attribute1->getType()->willReturn(AttributeTypes::TEXT);
         $attribute1->isLocalizable()->willReturn(true);
-        $attribute1->isScopable()->willReturn(true);
         $attribute1->isWysiwygEnabled()->willReturn(true);
 
-        $productValue2->getLocale()->willReturn($localeCode);
-        $productValue2->getScope()->willReturn('mobile');
+        $productValue2->getLocaleCode()->willReturn($localeCode);
+        $productValue2->getScopeCode()->willReturn('mobile');
         $productValue2->getData()->willReturn('foobar foobaz');
-        $productValue2->getAttribute()->willReturn($attribute1);
+        $productValue2->getAttributeCode()->willReturn('att1');
+        $productValue2->isScopable()->willReturn(true);
 
-        $productValue3->getLocale()->willReturn($localeCode);
-        $productValue3->getAttribute()->willReturn($attribute3);
+        $productValue3->getLocaleCode()->willReturn($localeCode);
+        $productValue3->getAttributeCode()->willReturn('att3');
+        $productValue3->isScopable()->willReturn(true);
 
         $attribute3->getCode()->willReturn('att3');
         $attribute3->getType()->willReturn(AttributeTypes::BOOLEAN);
         $attribute3->isLocalizable()->willReturn(true);
-        $attribute3->isScopable()->willReturn(true);
         $attribute3->isWysiwygEnabled()->willReturn(true);
 
-        $productValue4->getLocale()->willReturn($localeCode);
-        $productValue4->getAttribute()->willReturn($attribute4);
+        $productValue4->getLocaleCode()->willReturn($localeCode);
+        $productValue4->getAttributeCode()->willReturn('att4');
+        $productValue4->isScopable()->willReturn(true);
 
         $attribute4->getCode()->willReturn('att4');
         $attribute4->getType()->willReturn(AttributeTypes::TEXT);
         $attribute4->isLocalizable()->willReturn(false);
         $attribute4->isWysiwygEnabled()->willReturn(true);
 
-        $productValue5->getLocale()->willReturn($localeCode);
-        $productValue5->getAttribute()->willReturn($attribute5);
+        $productValue5->getLocaleCode()->willReturn($localeCode);
+        $productValue5->getAttributeCode()->willReturn('att5');
         $productValue5->getData()->willReturn('attribute5 data');
+        $productValue5->isScopable()->willReturn(false);
 
         $attribute5->getCode()->willReturn('att5');
         $attribute5->getType()->willReturn(AttributeTypes::TEXT);
         $attribute5->isLocalizable()->willReturn(true);
-        $attribute5->isScopable()->willReturn(false);
         $attribute5->isWysiwygEnabled()->willReturn(true);
+
+	$product->getUsedAttributeCodes()->willReturn(['att1', 'att2', 'att5']);
+	$attributeRepository->findOneByIdentifier('att1')->willReturn($attribute1);
+	$attributeRepository->findOneByIdentifier('att3')->willReturn($attribute3);
+	$attributeRepository->findOneByIdentifier('att4')->willReturn($attribute4);
+	$attributeRepository->findOneByIdentifier('att5')->willReturn($attribute5);
+	$container->get('pim_catalog.repository.attribute')->willReturn($attributeRepository);
 
         $product->getValues()->willReturn([
             $productValue1,
@@ -157,7 +166,6 @@ class BuilderSpec extends ObjectBehavior
                 'att1-mobile'    => ['original_phrase' => 'foobar foobaz'],
                 'att5'           => ['original_phrase' => 'attribute5 data'],
             ],
-            'perform_word_count' => true,
             'markup_in_content'  => true,
         ];
 
@@ -172,35 +180,40 @@ class BuilderSpec extends ObjectBehavior
         ValueInterface $productValue2,
         ValueInterface $productValue3,
         AttributeInterface $attribute3,
-        $configManager
+	AttributeRepository $attributeRepository,
+        $configManager,
+        $container
     ) {
         $configManager->get('pim_powerling.attributes')
             ->willReturn('att1,att2,att5');
         $localeCode = 'en_US';
 
-        $productValue1->getLocale()->willReturn($localeCode);
-        $productValue1->getScope()->willReturn('ecommerce');
+        $productValue1->getLocaleCode()->willReturn($localeCode);
+        $productValue1->getScopeCode()->willReturn('ecommerce');
         $productValue1->getData()->willReturn(null);
-        $productValue1->getAttribute()->willReturn($attribute1);
+        $productValue1->getAttributeCode()->willReturn('att1');
+        $productValue1->isScopable()->willReturn(true);
 
         $attribute1->getCode()->willReturn('att1');
         $attribute1->getType()->willReturn(AttributeTypes::TEXT);
         $attribute1->isLocalizable()->willReturn(true);
-        $attribute1->isScopable()->willReturn(true);
         $attribute1->isWysiwygEnabled()->willReturn(false);
 
-        $productValue2->getLocale()->willReturn($localeCode);
-        $productValue2->getScope()->willReturn('mobile');
+        $productValue2->getLocaleCode()->willReturn($localeCode);
+        $productValue2->getScopeCode()->willReturn('mobile');
         $productValue2->getData()->willReturn(null);
-        $productValue2->getAttribute()->willReturn($attribute1);
+        $productValue2->getAttributeCode()->willReturn('att1');
+        $productValue2->isScopable()->willReturn(true);
 
-        $productValue3->getLocale()->willReturn($localeCode);
-        $productValue3->getAttribute()->willReturn($attribute3);
+        $productValue3->getLocaleCode()->willReturn($localeCode);
+        $productValue3->getAttributeCode()->willReturn('att3');
+        $productValue3->isScopable()->willReturn(true);
 
         $attribute3->getCode()->willReturn('att3');
         $attribute3->getType()->willReturn(AttributeTypes::BOOLEAN);
         $attribute3->isLocalizable()->willReturn(true);
-        $attribute3->isScopable()->willReturn(true);
+
+	$product->getUsedAttributeCodes()->willReturn(['att1', 'att3']);
 
         $product->getValues()->willReturn([
             $productValue1,
@@ -208,6 +221,9 @@ class BuilderSpec extends ObjectBehavior
             $productValue3,
         ]);
         $product->getIdentifier()->willReturn('fooSku');
+	$attributeRepository->findOneByIdentifier('att1')->willReturn($attribute1);
+	$attributeRepository->findOneByIdentifier('att3')->willReturn($attribute3);
+	$container->get('pim_catalog.repository.attribute')->willReturn($attributeRepository);
 
         $this->createDocumentData($product, $localeCode)
             ->shouldReturn(null);

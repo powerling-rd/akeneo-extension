@@ -16,14 +16,14 @@ services:
                 type: '%pim_enrich.job.mass_edit_type%'
 
     pim_powerling.mass_edit.job.job_parameters.default_values_provider.start_projects:
-        class: '%pim_enrich.connector.job.job_parameters.default_values_provider.product_mass_edit.class%'
+        class: 'Akeneo\Pim\Enrichment\Component\Product\Connector\Job\JobParameters\DefaultValueProvider\ProductMassEdit'
         arguments:
             - ['powerling_start_projects']
         tags:
             - { name: akeneo_batch.job.job_parameters.default_values_provider }
 
     pim_powerling.mass_edit.job.job_parameters.constraint_collection_provider.start_projects:
-        class: '%pim_enrich.connector.job.job_parameters.constraint_collection_provider.product_mass_edit.class%'
+        class: 'Akeneo\Pim\Enrichment\Component\Product\Connector\Job\JobParameters\ConstraintCollectionProvider\ProductMassEdit'
         arguments:
             - ['powerling_start_projects']
         tags:

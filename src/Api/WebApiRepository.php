@@ -17,25 +17,28 @@ class WebApiRepository implements WebApiRepositoryInterface
     /** @var ConfigManager */
     protected $configManager;
 
-    const API_BASE_URI = 'https://api-sbx.powerling-tp.com/';
+    private $baseUri;
 
     /**
      * @param ConfigManager $configManager
+     * @param string $baseUri
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, $baseUri)
     {
         $this->configManager = $configManager;
+        $this->baseUri = $baseUri;
     }
 
     /**
      * @param ProjectInterface $project
      * @return void
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function sendProjectDocuments(ProjectInterface $project)
     {
         list($sourceLanguage, $targetLanguage) = explode('$', $project->getLangAssociationId());
 
-        foreach($project->getDocuments() as $document) {
+        foreach ($project->getDocuments() as $document) {
             $xliff = $this->documentToXliff($document, $sourceLanguage, $targetLanguage);
             $this->doRequest('order/'.$project->getCode().'/upload-file', [
                 'sourcelang' => $sourceLanguage,
@@ -49,28 +52,28 @@ class WebApiRepository implements WebApiRepositoryInterface
 
     private function documentToXliff($document, $sourceLanguage, $targetLanguage)
     {
-        $xml = new \DOMDocument( '1.0', 'UTF-8');
+        $xml = new \DOMDocument('1.0', 'UTF-8');
         $xml->formatOutput = true;
-        $xmlTranslationProject = $xml->createElement( 'xliff');
+        $xmlTranslationProject = $xml->createElement('xliff');
         $xmlTranslationProject->setAttribute('version', '1.2');
         $xml->appendChild($xmlTranslationProject);
-        $xmlSheet = $xml->createElement( 'file');
+        $xmlSheet = $xml->createElement('file');
         $xmlSheet->setAttribute('source-language', $sourceLanguage);
         $xmlSheet->setAttribute('target-language', $targetLanguage);
         $xmlSheet->setAttribute('id', $document['title']);
         $xmlTranslationProject->appendChild($xmlSheet);
-        $xmlBody = $xml->createElement( 'body');
+        $xmlBody = $xml->createElement('body');
         $xmlSheet->appendChild($xmlBody);
 
         foreach ($document['original_content'] as $field => $data) {
-            $xmlTransItem = $xml->createElement( 'trans-unit');
+            $xmlTransItem = $xml->createElement('trans-unit');
             $xmlTransItem->setAttribute('id', $field);
-            $xmlTransSource = $xml->createElement( 'source');
+            $xmlTransSource = $xml->createElement('source');
             $xmlTransSource->setAttribute('xml:lang', $sourceLanguage);
             $xmlTransSource->appendChild($xml->createCDATASection($data['original_phrase']));
             $xmlTransItem->appendChild($xmlTransSource);
 
-            $xmlTransDest = $xml->createElement( 'target');
+            $xmlTransDest = $xml->createElement('target');
             $xmlTransDest->setAttribute('xml:lang', $targetLanguage);
             $xmlTransItem->appendChild($xmlTransDest);
 
@@ -116,7 +119,7 @@ class WebApiRepository implements WebApiRepositoryInterface
             }
         }
 
-       return [$documents, count($documentsToRetrieve) === count($documents)];
+        return [$documents, count($response['data']) === count($documents)];
     }
 
     /**
@@ -148,7 +151,7 @@ class WebApiRepository implements WebApiRepositoryInterface
     private function processTranslatedDocument($projectCode, $documentCode)
     {
         $client = new \GuzzleHttp\Client();
-        $targetFileResponse = $client->request('GET', self::API_BASE_URI.'target/'.$projectCode.'-'.$documentCode.'.xliff');
+        $targetFileResponse = $client->request('GET', $this->baseUri.'/target/'.$projectCode.'-'.$documentCode.'.xliff');
 
         $doc = new \DOMDocument();
         $doc->loadXML($targetFileResponse->getBody()->__toString());
@@ -156,7 +159,7 @@ class WebApiRepository implements WebApiRepositoryInterface
         $fields = [];
 
         /** @var \DOMElement $transUnit */
-        foreach($doc->getElementsByTagName('trans-unit') as $transUnit) {
+        foreach ($doc->getElementsByTagName('trans-unit') as $transUnit) {
             $field = $transUnit->getAttribute('id');
             $value = $transUnit->getElementsByTagName('target')[0]->nodeValue;
             $fields[$field] = $value;
@@ -197,7 +200,7 @@ class WebApiRepository implements WebApiRepositoryInterface
             }
         }
 
-        $httpResponse = $client->request(is_null($postData) ? 'GET' : 'POST', self::API_BASE_URI.'v1/'.$endpoint, $requestOptions);
+        $httpResponse = $client->request(is_null($postData) ? 'GET' : 'POST', $this->baseUri.'/v1/'.$endpoint, $requestOptions);
         return json_decode($httpResponse->getBody(), true);
     }
 }

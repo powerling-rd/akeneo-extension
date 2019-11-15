@@ -2,16 +2,15 @@
 
 namespace Pim\Bundle\PowerlingBundle\MassAction;
 
-use Akeneo\Component\Batch\Item\DataInvalidItem;
-use Akeneo\Component\Batch\Item\ExecutionContext;
-use Akeneo\Component\StorageUtils\Detacher\ObjectDetacherInterface;
+use Akeneo\Tool\Component\Batch\Item\ExecutionContext;
+use Akeneo\Tool\Component\StorageUtils\Detacher\ObjectDetacherInterface;
 use Doctrine\Common\Util\ClassUtils;
 use Exception;
-use Pim\Bundle\EnrichBundle\Connector\Processor\AbstractProcessor;
+use Akeneo\Pim\Enrichment\Component\Product\Connector\Processor\MassEdit\AbstractProcessor;
 use Pim\Bundle\PowerlingBundle\Api\WebApiRepository;
 use Pim\Bundle\PowerlingBundle\Project\BuilderInterface;
 use Pim\Bundle\PowerlingBundle\Project\ProjectInterface;
-use Pim\Component\Catalog\Model\ProductInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ProductInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -73,13 +72,10 @@ class AddDocumentsProcessor extends AbstractProcessor
             $attributesToTranslate = $this->projectBuilder->createDocumentData($product, $fromLocale);
 
             if (null === $attributesToTranslate) {
-                $invalidItem = new DataInvalidItem([
-                    'product identifier' => $product->getIdentifier(),
-                ]);
-                $this->stepExecution->addWarning('No content to translate for product', [], $invalidItem);
+                $this->stepExecution->incrementSummaryInfo('no_translation');
             } else {
                 $project->addDocument($attributesToTranslate);
-                $this->stepExecution->incrementSummaryInfo('documents_added', 1);
+                $this->stepExecution->incrementSummaryInfo('documents_added');
             }
             $this->logger->debug(
                 sprintf('Add %d documents to project %s', count($project->getDocuments()), $project->getCode())

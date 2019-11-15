@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\PowerlingBundle\Product;
 
-use Pim\Component\Catalog\Model\ProductInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ProductInterface;
 
 /**
  * Update Akeneo product from Powerling data
