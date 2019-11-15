@@ -1,0 +1,16 @@
+config:
+    paths:
+        powerling/system/configuration: pimpowerling/js/form/system
+        powerling/template/system/group/configuration: pimpowerling/js/templates/system/group/configuration.html
+
+        powerling/mass_edit: pimpowerling/js/mass_edit/powerling_mass_edit
+        powerling/template/mass_edit: pimpowerling/js/templates/mass_edit/powerling_mass_edit.html
+
+    config:
+        pim/fetcher-registry:
+            fetchers:
+                powerling-lang-associations:
+                    module: pim/base-fetcher
+                    options:
+                        urls:
+                            list: powerling_rest_lang-associations

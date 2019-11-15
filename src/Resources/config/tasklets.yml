@@ -1,0 +1,15 @@
+services:
+    pim_powerling.tasklet.create_projects:
+        class: Pim\Bundle\PowerlingBundle\MassAction\CreateProjectsTasklet
+        arguments:
+            - '@pim_catalog.repository.locale'
+            - '@pim_powerling.project.builder'
+            - '@pim_powerling.repository.webapi'
+            - '@pim_powerling.saver.project'
+
+    pim_powerling.tasklet.send_projects:
+        class: Pim\Bundle\PowerlingBundle\MassAction\SendProjectsTasklet
+        arguments:
+            - '@pim_powerling.repository.webapi'
+            - '@oro_config.global'
+            - '@translator.default'

@@ -1,0 +1,8 @@
+services:
+    pim_powerling.mass_edit.processor.add_documents:
+        class: Pim\Bundle\PowerlingBundle\MassAction\AddDocumentsProcessor
+        arguments:
+            - '@pim_powerling.project.builder'
+            - '@akeneo_storage_utils.doctrine.object_detacher'
+            - '@pim_powerling.repository.webapi'
+            - '@monolog.logger.powerling'

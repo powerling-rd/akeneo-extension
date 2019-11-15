@@ -1,0 +1,18 @@
+# Powerling extension configuration
+pim_powerling:
+    settings:
+        api_key:
+            value: your_api_key
+            scope: app
+        attributes:
+            value: ~
+            scope: app
+
+monolog:
+    channels: ['powerling']
+    handlers:
+        powerling:
+            type:  stream
+            path:  %kernel.logs_dir%/powerling_%kernel.environment%.log
+            level: info
+            channels: powerling

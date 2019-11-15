@@ -1,0 +1,15 @@
+powerling:
+    configuration:
+        tab:
+            label: Powerling
+        link:
+            label: Aller sur Powerling
+        api_key:
+            label: API key
+        attributes:
+            label: Attributs
+        autolaunch:
+            label: Lancement automatique du projet
+        section:
+            credentials: Authentification
+            settings: Configuration

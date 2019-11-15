@@ -1,0 +1,25 @@
+pim_enrich:
+    mass_edit_action:
+        powerling_start_projects:
+            label: Traduire les produits avec Powerling
+            description: Créer un nouveau projet de traduction project Powerling.
+            launched_flash: Les produits à traduire sont envoyés vers l'application Powerling.
+
+powerling:
+    create_project:
+        label: Traduire les données produit avec Powerling
+    customer:
+        validation_link: Aller sur Powerling pour valider et lancer les projets
+        launched_link: Aller sur Powerling
+    step:
+        create_projects: Creation de projets dans Powerling
+        add_documents: Ajout de documents aux projets
+    steps:
+        skipped_document.title: Document non traité
+
+job_execution.summary.projects_created: Projets créés
+job_execution.summary.documents_added: Documents ajoutés
+job_execution.summary.launched: Projects lancés
+job_execution.summary.not_launched: Projets prêts à lancer
+job_execution.summary.link: Lien direct
+job_execution.summary.memory_analysis: Mémoire de traduction

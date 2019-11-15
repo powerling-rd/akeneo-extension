@@ -1,0 +1,20 @@
+<div class="AknFieldContainer">
+    <div class="AknFieldContainer-header">
+        <label class="AknFieldContainer-label"for="powerling-name">Project name</label>
+    </div>
+    <div class="AknFieldContainer-inputContainer">
+        <input class="AknTextField powerling-field" id="powerling-name"
+               name="name"
+               type="text" value="<%- name %>"/>
+    </div>
+</div>
+<div class="AknFieldContainer">
+    <div class="AknFieldContainer-header">
+        <label class="AknFieldContainer-label"for="powerling-lang-associations">Lang Association</label>
+    </div>
+    <div class="AknFieldContainer-inputContainer">
+        <input class="select-field multi-select powerling-field"
+               id="powerling-lang-associations" name="langAssociations"
+               type="hidden" value="<%- langAssociations %>"/>
+    </div>
+</div>
