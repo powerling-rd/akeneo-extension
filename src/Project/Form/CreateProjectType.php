@@ -3,11 +3,9 @@
 namespace Pim\Bundle\PowerlingBundle\Project\Form;
 
 use Pim\Bundle\PowerlingBundle\Api\WebApiRepository;
-use Pim\Bundle\PowerlingBundle\MassAction\Operation\CreateProjects;
-use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
+use Akeneo\Channel\Component\Repository\LocaleRepositoryInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -15,7 +13,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @author    Arnaud Lejosne <a.lejosne@powerling.com>
  * @copyright 2019 Powerling (https://powerling.com)
-*/
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
 class CreateProjectType extends AbstractType
 {
     /** @var LocaleRepositoryInterface */
@@ -44,6 +43,7 @@ class CreateProjectType extends AbstractType
 
     /**
      * {@inheritdoc}
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -64,16 +64,6 @@ class CreateProjectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            ['data_class' => CreateProjects::class]
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'powerling_create_projects';
@@ -81,6 +71,7 @@ class CreateProjectType extends AbstractType
 
     /**
      * @return string[]
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function getLangAssociationsChoices()
     {

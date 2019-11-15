@@ -2,13 +2,21 @@
 
 namespace Pim\Bundle\PowerlingBundle\Project;
 
+use Akeneo\Pim\Enrichment\Component\Product\Model\EntityWithValuesInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ProductModel;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ProductModelInterface;
+use Akeneo\Pim\Structure\Bundle\Doctrine\ORM\Repository\AttributeRepository;
+use Akeneo\Tool\Component\StorageUtils\Detacher\ObjectDetacherInterface;
+use Doctrine\Common\Util\ClassUtils;
+use Exception;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Pim\Bundle\PowerlingBundle\Project\Exception\RuntimeException;
-use Pim\Component\Catalog\AttributeTypes;
-use Pim\Component\Catalog\Model\AttributeInterface;
-use Pim\Component\Catalog\Model\ProductInterface;
-use Pim\Component\Catalog\Model\ValueInterface;
+use Akeneo\Pim\Structure\Component\AttributeTypes;
+use Akeneo\Pim\Structure\Component\Model\AttributeInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ProductInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ValueInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -29,17 +37,41 @@ class Builder implements BuilderInterface
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var array */
+    protected $powerlingAttributes;
+
+    /** @var array */
+    protected $availableAttributes = [];
+
+    /** @var Container */
+    protected $container;
+
+    /** @var ObjectDetacherInterface */
+    protected $objectDetacher;
+
+    /** @var AttributeRepository */
+    protected $attributeRepository;
+
+    /** @var array */
+    protected $attributes = [];
+
     /**
-     * @param ConfigManager   $configManager
+     * @param ConfigManager $configManager
+     * @param ObjectDetacherInterface $objectDetacher
      * @param LoggerInterface $logger
+     * @param Container $container
+     * @throws Exception
      */
-    public function __construct(ConfigManager $configManager, LoggerInterface $logger)
+    public function __construct(ConfigManager $configManager, ObjectDetacherInterface $objectDetacher, LoggerInterface $logger, Container $container)
     {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         $this->options = $resolver->resolve([]);
         $this->configManager = $configManager;
+        $this->objectDetacher = $objectDetacher;
         $this->logger = $logger;
+        $this->container            = $container;
+        $this->attributeRepository  = $this->container->get('pim_catalog.repository.attribute');
     }
 
     /**
@@ -59,18 +91,27 @@ class Builder implements BuilderInterface
 
     /**
      * @inheritdoc
+     * @throws \Exception
      */
-    public function createDocumentData(ProductInterface $product, $sourceLocale)
+    public function createDocumentData($product, $localeCode)
     {
-        $productValues = $product->getValues();
+        $docData = $this->getProductValuesTitle($product);
         $originalContent = [];
-        $wysiwyg = false;
-        foreach ($productValues as $productValue) {
-            /** @var ValueInterface $productValue */
-            if ($this->isValidForTranslation($productValue->getAttribute()) && $sourceLocale === $productValue->getLocale()) {
-                $key = $this->createProductValueKey($productValue);
+        $wysiwyg         = false;
+
+        /** @var ValueInterface $productValue */
+        foreach ($docData['product_values'] as $productValue) {
+            $code = $productValue->getAttributeCode();
+            $attribute = $this->getAttributeByCode($code);
+
+            if (
+                $this->isValidForTranslation($attribute)
+                && $localeCode === $productValue->getLocaleCode()
+            ) {
+                $key            = $this->createProductValueKey($productValue);
                 $originalPhrase = trim($productValue->getData());
-                if ($productValue->getAttribute()->isWysiwygEnabled()) {
+
+                if ($attribute->isWysiwygEnabled()) {
                     $wysiwyg = true;
                 }
                 if (!empty($originalPhrase)) {
@@ -78,20 +119,99 @@ class Builder implements BuilderInterface
                 }
             }
         }
+        $documentData = [
+            'title'              => $docData['title'],
+            'original_content'   => $originalContent,
+            'markup_in_content'  => $wysiwyg,
+        ];
 
         if (empty($originalContent)) {
             return null;
         }
 
-        $documentData = [
-            'title'              => $product->getIdentifier(),
-            'original_content'   => $originalContent,
-            'markup_in_content'  => $wysiwyg
-        ];
-
         $this->logger->debug(sprintf('Create document data: %s', json_encode($documentData)));
-
         return $documentData;
+    }
+
+    /**
+     * getProductValuesTitle
+     *
+     * @param EntityWithValuesInterface $product
+     *
+     * @return array
+     * @throws \Exception
+     */
+    private function getProductValuesTitle(EntityWithValuesInterface $product): array
+    {
+        if ($product instanceof ProductInterface) {
+            $title = $product->getIdentifier();
+        } elseif ($product instanceof ProductModel) {
+            $title = sprintf('product_model|%s', $product->getCode());
+        } else {
+            throw new Exception(
+                sprintf(
+                    'Processed item must implement ProductInterface or Product Model, %s given',
+                    ClassUtils::getClass($product)
+                )
+            );
+        }
+
+        $productValues       = [];
+        $availableAttributes = $this->getAvailableAttributes($product);
+
+        /** @var ValueInterface $productValue */
+        foreach ($product->getValues() as $productValue) {
+            if (in_array($productValue->getAttributeCode(), $availableAttributes)) {
+                $productValues[] = $productValue;
+            }
+        }
+
+        return ['product_values' => $productValues, 'title' => $title];
+    }
+
+    /**
+     * Retrieve available attribute codes.
+     *
+     * @param EntityWithValuesInterface $product
+     *
+     * @return array
+     */
+    protected function getAvailableAttributes(EntityWithValuesInterface $product): array
+    {
+        $availableAttributes = array_intersect($this->getPowerlingAttributes(), $product->getUsedAttributeCodes());
+
+        if ($product instanceof ProductModelInterface) {
+            $familyVariantCode = $product->getFamilyVariant()->getCode();
+            if (0 === $product->getLevel()) {
+                $this->availableAttributes[$familyVariantCode] = $product->getUsedAttributeCodes();
+            }
+            if (1 === $product->getLevel()) {
+                if (!isset($this->availableAttributes[$familyVariantCode])) {
+                    $this->availableAttributes[$familyVariantCode] = $this->getAvailableAttributes(
+                        $product->getParent()
+                    );
+                    $this->objectDetacher->detach($product->getParent());
+                }
+                $availableAttributes = array_diff(
+                    $availableAttributes,
+                    $this->availableAttributes[$familyVariantCode]
+                );
+            }
+        }
+
+        return $availableAttributes;
+    }
+
+    /**
+     * Retrieve available attributes from product.
+     *
+     * @param EntityWithValuesInterface $product
+     *
+     * @return array
+     */
+    protected function getAvailableAttributesFromProduct(EntityWithValuesInterface $product)
+    {
+        return array_intersect($this->getPowerlingAttributes(), $product->getUsedAttributeCodes());
     }
 
     /**
@@ -101,16 +221,31 @@ class Builder implements BuilderInterface
      *
      * @return string
      */
-    public function createProductValueKey(ValueInterface $productValue)
+    public function createProductValueKey(ValueInterface $productValue): string
     {
-        $attribute = $productValue->getAttribute();
-        $key = $attribute->getCode();
+        $attributeCode = $productValue->getAttributeCode();
 
-        if ($attribute->isScopable()) {
-            $key = sprintf('%s-%s', $attribute->getCode(), $productValue->getScope());
+        if ($productValue->isScopable()) {
+            $attributeCode = sprintf('%s-%s', $attributeCode, $productValue->getScopeCode());
         }
 
-        return $key;
+        return $attributeCode;
+    }
+
+    /**
+     * getPowerlingAttributes
+     *
+     * @return string[]
+     */
+    protected function getPowerlingAttributes(): array
+    {
+        if (null === $this->powerlingAttributes) {
+            $this->powerlingAttributes = explode(',', $this->configManager->get('pim_powerling.attributes'));
+            if (empty($this->powerlingAttributes)) {
+                throw new RuntimeException('No attributes configured for translation');
+            }
+        }
+        return $this->powerlingAttributes;
     }
 
     /**
@@ -118,22 +253,14 @@ class Builder implements BuilderInterface
      *
      * @return bool
      */
-    protected function isValidForTranslation(AttributeInterface $attribute)
+    protected function isValidForTranslation(AttributeInterface $attribute): bool
     {
-        $attributesSetting = $this->configManager->get('pim_powerling.attributes');
-
-        if (empty($attributesSetting)) {
-            throw new RuntimeException('No attributes configured for translation');
-        }
-
-        $attributeCodes = explode(',', $attributesSetting);
-
-        if (!in_array($attribute->getCode(), $attributeCodes)) {
+        if (!in_array($attribute->getCode(), $this->getPowerlingAttributes())) {
             return false;
         }
 
-        $isText = AttributeTypes::TEXT === $attribute->getType() ||
-            AttributeTypes::TEXTAREA === $attribute->getType();
+        $isText = AttributeTypes::TEXT === $attribute->getType()
+            || AttributeTypes::TEXTAREA === $attribute->getType();
 
         return $isText && $attribute->isLocalizable();
     }
@@ -141,10 +268,26 @@ class Builder implements BuilderInterface
     /**
      * @param OptionsResolver $resolver
      */
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'ctype' => 'translation',
-        ]);
+        $resolver->setDefaults(
+            [
+                'ctype' => 'translation',
+            ]
+        );
+    }
+
+    /**
+     * getAttributeByCode
+     *
+     * @param string $code
+     */
+    protected function getAttributeByCode($code)
+    {
+        if (!array_key_exists($code, $this->attributes)) {
+            $this->attributes[$code] = $this->attributeRepository->findOneByIdentifier($code);
+        }
+
+        return $this->attributes[$code];
     }
 }

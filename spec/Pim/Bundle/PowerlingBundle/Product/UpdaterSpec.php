@@ -4,9 +4,9 @@ namespace spec\Pim\Bundle\PowerlingBundle\Product;
 
 use PhpSpec\ObjectBehavior;
 use Pim\Bundle\PowerlingBundle\Product\UpdaterInterface;
-use Pim\Component\Catalog\Model\ProductInterface;
-use Pim\Component\Catalog\Repository\ProductRepositoryInterface;
-use Pim\Component\Catalog\Updater\ProductUpdater;
+use Akeneo\Pim\Enrichment\Component\Product\Model\ProductInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Repository\ProductRepositoryInterface;
+use Akeneo\Pim\Enrichment\Component\Product\Updater\ProductUpdater;
 
 /**
  * @author    Arnaud Lejosne <a.lejosne@powerling.com>
@@ -39,7 +39,7 @@ class UpdaterSpec extends ObjectBehavior
             'foo-ecommerce' => 'foo ecommerce translation',
             'foo-mobile'    => 'foo mobile translation',
             'bar-ecommerce' => 'bar ecommerce translation',
-        ]);
+        ];
 
         $data = [
             'foo' => [
@@ -52,6 +52,6 @@ class UpdaterSpec extends ObjectBehavior
         ];
 
         $productUpdater->update($product, ['values' => $data])->shouldBeCalled();
-        $this->update($document, $localeCode);
+        $this->update('product-sku', $document, $localeCode);
     }
 }

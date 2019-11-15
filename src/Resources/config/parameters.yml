@@ -1,2 +1,2 @@
 parameters:
-    powerling.base_uri: 'https://api-sbx.powerling-tp.com/v1'
+    powerling.base_uri.app: 'https://api-sbx.powerling-tp.com'

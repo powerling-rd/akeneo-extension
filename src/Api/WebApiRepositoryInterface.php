@@ -2,8 +2,6 @@
 
 namespace Pim\Bundle\PowerlingBundle\Api;
 
-
-
 use Pim\Bundle\PowerlingBundle\Project\ProjectInterface;
 
 /**

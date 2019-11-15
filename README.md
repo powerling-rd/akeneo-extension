@@ -22,7 +22,7 @@ The translation request is done by a very simple mass edit process:
 
 First step is to require the sources:
 ```
-composer require powerling/akeneo-extension 2.3
+composer require powerling/akeneo-extension 3.0
 ```
 
 Register your bundle in the `AppKernel::registerProjectBundles`:
@@ -47,9 +47,13 @@ powerling:
 Update the database schema and regenerate your cache and assets:
 
 ```
-rm bin/cache/* -rf
-bin/console doctrine:schema:update --force
-rm -rf web/bundles/* web/css/* web/js/* ; bin/console pim:install:assets
+rm -rf var/cache/* web/bundles/* web/js/* web/css/*
+bin/console doctrine:schema:update --force --env=prod 
+bin/console p:i:a --env=prod
+bin/console a:i --env=prod
+yarn run webpack
+find ./ -type d -exec chmod 755 {} \;
+find ./ -type f -exec chmod 644 {} \;
 ```
 
 Finally, you must set a `cron` to retrieve the translated contents from Powerling:
@@ -70,6 +74,15 @@ In this screen you will be able to set:
 - you API credentials : `API key`
 - the attributes you want to translate
 
+### Sandbox
+
+When you install the extension, it aims at Powerling's sandbox environment.
+In order to make it aim at the production environment, add the following line to your parameters.yml file:
+
+```
+powerling.base_uri.app: 'https://api.powerling-tp.com'
+```
+
 ## Screenshots
 
 ![Select products](doc/img/01-select-products.png)
@@ -80,4 +93,4 @@ In this screen you will be able to set:
 
 ![Execution details](doc/img/04-execution-details.png)
 
-This extension is based on the Akeneo Textmaster extension developped by Jean-Marie Leroux and Jessy Jurkowski
+This extension is based on the Akeneo TextMaster extension developped by Jean-Marie Leroux and Jessy Jurkowski

@@ -1,0 +1,6 @@
+services:
+  pim_powerling.document.updater:
+    class: Pim\Bundle\PowerlingBundle\Product\Updater
+    arguments:
+      - '@pim_catalog.repository.product'
+      - '@pim_catalog.updater.product'
