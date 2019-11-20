@@ -1,5 +1,7 @@
 # Powerling extension for Akeneo PIM
 
+[![Build Status](https://travis-ci.org/powerling-rd/akeneo-extension.svg?branch=3.0)](https://travis-ci.org/powerling-rd/akeneo-extension)
+
 ## Description
 
 The Powerling Akeneo extension allows you to easily translate your Akeneo product contents to a large quantity of languages with a simple mass edit process.
