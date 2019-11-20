@@ -111,10 +111,10 @@ class WebApiRepository implements WebApiRepositoryInterface
             }
         }
         foreach ($documentsToRetrieve as $documentId) {
-            $response = $this->doRequest('order/'.$projectCode.'/file/'.$documentId.'/status');
+            $statusResponse = $this->doRequest('order/'.$projectCode.'/file/'.$documentId.'/status');
 
-            if (array_key_exists('targetfile', $response)) {
-                list($productId, $document) = $this->processTranslatedDocument($projectCode, $response['targetfile']);
+            if (array_key_exists('targetfile', $statusResponse)) {
+                list($productId, $document) = $this->processTranslatedDocument($projectCode, $statusResponse['targetfile']);
                 $documents[$productId] = $document;
             }
         }

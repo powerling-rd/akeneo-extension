@@ -61,7 +61,7 @@ class BuilderSpec extends ObjectBehavior
         $productValue1->getLocaleCode()->willReturn($localeCode);
         $productValue1->getScopeCode()->willReturn('ecommerce');
         $productValue1->getData()->willReturn('lorem ipsum');
-        $productValue1->getAttributeCode()->willReturn($attribute1);
+        $productValue1->getAttributeCode()->willReturn('att1');
         $productValue1->isScopable()->willReturn(true);
 
         $attribute1->getCode()->willReturn('att1');
@@ -73,10 +73,10 @@ class BuilderSpec extends ObjectBehavior
         $product->getValues()->willReturn([
             $productValue1,
         ]);
-//        $product->getIdentifier()->willReturn('fooSku');
+        $product->getIdentifier()->willReturn('fooSku');
 
-//        $this->shouldThrow(new RuntimeException('No attributes configured for translation'))
-//            ->during('createDocumentData', [$product, $localeCode]);
+        $this->shouldThrow(new RuntimeException('No attributes configured for translation'))
+            ->during('createDocumentData', [$product, $localeCode]);
     }
 
     function it_creates_document_data(

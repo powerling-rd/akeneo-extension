@@ -240,11 +240,14 @@ class Builder implements BuilderInterface
     protected function getPowerlingAttributes(): array
     {
         if (null === $this->powerlingAttributes) {
-            $this->powerlingAttributes = explode(',', $this->configManager->get('pim_powerling.attributes'));
-            if (empty($this->powerlingAttributes)) {
+            $attributeStr = $this->configManager->get('pim_powerling.attributes');
+            $this->powerlingAttributes = explode(',', $attributeStr);
+
+            if (empty($attributeStr) || empty($this->powerlingAttributes)) {
                 throw new RuntimeException('No attributes configured for translation');
             }
         }
+
         return $this->powerlingAttributes;
     }
 
