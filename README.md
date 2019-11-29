@@ -1,6 +1,6 @@
 # Powerling extension for Akeneo PIM
 
-[![Build Status](https://travis-ci.org/powerling-rd/akeneo-extension.svg?branch=3.1)](https://travis-ci.org/powerling-rd/akeneo-extension)
+[![Build Status](https://travis-ci.org/powerling-rd/akeneo-extension.svg?branch=3.2)](https://travis-ci.org/powerling-rd/akeneo-extension)
 
 ## Description
 
@@ -24,7 +24,7 @@ The translation request is done by a very simple mass edit process:
 
 First step is to require the sources:
 ```
-composer require powerling/akeneo-extension 3.1
+composer require powerling/akeneo-extension 3.2
 ```
 
 Register your bundle in the `AppKernel::registerProjectBundles`:
