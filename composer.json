@@ -16,7 +16,7 @@
         "php": ">=7.2",
         "ext-dom": "*",
         "ext-json": "*",
-        "akeneo/pim-community-dev": "3.0.*",
+        "akeneo/pim-community-dev": "3.1.*",
         "guzzlehttp/guzzle": "^6.4"
     },
     "require-dev": {
