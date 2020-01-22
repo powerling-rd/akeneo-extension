@@ -13,3 +13,22 @@ powerling:
         section:
             credentials: Authentification
             settings: Configuration
+
+    mass_edit:
+        product:
+            title: Traduire avec Powerling
+            description: Traduire les informations produit avec Powerling
+
+powerling.index.project.create_btn:  Créer un projet
+
+pim_powerling:
+    field:
+        label:
+            project_identifier: Identifiant projet
+            product_identifier: Identifiant produit
+            product_label:      Libellé produit
+            language:           Langue
+            status:             Status
+            updated_at:         Date de mise à jour
+    action:
+        show_on_powerling: Afficher ce produit chez Powerling
