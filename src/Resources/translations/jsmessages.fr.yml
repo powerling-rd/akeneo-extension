@@ -13,3 +13,8 @@ powerling:
         section:
             credentials: Authentification
             settings: Configuration
+
+    mass_edit:
+        product:
+            title: Traduire avec Powerling
+            description: Traduire les informations produit avec Powerling
