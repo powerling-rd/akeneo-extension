@@ -28,5 +28,10 @@
         "psr-4": {
             "Pim\\Bundle\\PowerlingBundle\\": "src/"
         }
+    },
+     "config": {
+        "platform": {
+            "php": "7.1.0"
+        }
     }
 }
