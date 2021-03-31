@@ -1,8 +1,10 @@
 parameters:
-  pim_powerling.controller.rest.class: Pim\Bundle\PowerlingBundle\Controller\PowerlingRestController
+    pim_powerling.controller.rest.class: Pim\Bundle\PowerlingBundle\Controller\PowerlingRestController
 
 services:
-  pim_powerling.controller.rest:
-    class: '%pim_powerling.controller.rest.class%'
-    arguments:
-      - '@pim_powerling.repository.webapi'
+    pim_powerling.controller.rest:
+        class: '%pim_powerling.controller.rest.class%'
+        arguments:
+            - '@pim_powerling.repository.webapi'
+        tags:
+            - {name: controller.service_arguments}

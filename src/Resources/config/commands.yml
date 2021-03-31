@@ -1,0 +1,16 @@
+services:
+    Pim\Bundle\PowerlingBundle\Command\ListLangAssocCommand:
+        arguments:
+            - '@pim_powerling.repository.webapi'
+        tags:
+            - { name: 'console.command', command: 'pim:powerling:list-lang-assoc' }
+
+    Pim\Bundle\PowerlingBundle\Command\RetrieveTranslationsCommand:
+        arguments:
+            - '@pim_powerling.repository.webapi'
+            - '@pim_powerling.repository.project'
+            - '@pim_powerling.document.updater'
+            - '@pim_powerling.remover.project'
+            - '@pim_catalog.saver.product'
+        tags:
+            - { name: 'console.command', command: 'pim:powerling:retrieve-translations' }

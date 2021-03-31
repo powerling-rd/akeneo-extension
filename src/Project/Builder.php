@@ -18,6 +18,7 @@ use Akeneo\Pim\Enrichment\Component\Product\Model\ValueInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Akeneo\Pim\Structure\Component\Repository\AttributeRepositoryInterface;
 
 /**
  * Powerling builder.
@@ -43,9 +44,6 @@ class Builder implements BuilderInterface
     /** @var array */
     protected $availableAttributes = [];
 
-    /** @var Container */
-    protected $container;
-
     /** @var ObjectDetacherInterface */
     protected $objectDetacher;
 
@@ -59,10 +57,9 @@ class Builder implements BuilderInterface
      * @param ConfigManager $configManager
      * @param ObjectDetacherInterface $objectDetacher
      * @param LoggerInterface $logger
-     * @param Container $container
      * @throws Exception
      */
-    public function __construct(ConfigManager $configManager, ObjectDetacherInterface $objectDetacher, LoggerInterface $logger, Container $container)
+    public function __construct(ConfigManager $configManager, ObjectDetacherInterface $objectDetacher, LoggerInterface $logger, AttributeRepositoryInterface $attributeRepository)
     {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
@@ -70,8 +67,7 @@ class Builder implements BuilderInterface
         $this->configManager = $configManager;
         $this->objectDetacher = $objectDetacher;
         $this->logger = $logger;
-        $this->container            = $container;
-        $this->attributeRepository  = $this->container->get('pim_catalog.repository.attribute');
+        $this->attributeRepository  = $attributeRepository;
     }
 
     /**

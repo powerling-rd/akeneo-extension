@@ -17,11 +17,10 @@ services:
 
     pim_powerling.project.builder:
         class: 'Pim\Bundle\PowerlingBundle\Project\Builder'
-        public: false
         arguments:
             - '@oro_config.global'
             - '@akeneo_storage_utils.doctrine.object_detacher'
             - '@monolog.logger.powerling'
-            - '@service_container'
+            - '@pim_catalog.repository.attribute'
         tags:
             - { name: monolog.logger, channel: powerling }

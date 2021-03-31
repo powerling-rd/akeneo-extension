@@ -1,4 +1,6 @@
 services:
+    _defaults:
+        public: true
     pim_powerling.mass_edit.processor.add_documents:
         class: Pim\Bundle\PowerlingBundle\MassAction\AddDocumentsProcessor
         arguments:

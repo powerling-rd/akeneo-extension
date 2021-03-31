@@ -1,19 +1,21 @@
 parameters:
-  pim_powerling.repository.webapi.class:   Pim\Bundle\PowerlingBundle\Api\WebApiRepository
-  pim_powerling.repository.project.class:  Pim\Bundle\PowerlingBundle\Project\ProjectRepository
+    pim_powerling.repository.webapi.class:   Pim\Bundle\PowerlingBundle\Api\WebApiRepository
+    pim_powerling.repository.project.class:  Pim\Bundle\PowerlingBundle\Project\ProjectRepository
 
 services:
-  pim_powerling.repository.webapi:
-    class: '%pim_powerling.repository.webapi.class%'
-    public: false
-    arguments:
-      - '@oro_config.global'
-      - '%powerling.base_uri.app%'
-      -
-  pim_powerling.repository.project:
-    class: '%pim_powerling.repository.project.class%'
-    factory: 'doctrine.orm.entity_manager:getRepository'
-    arguments:
-      - '%pim_powerling.entity.project.class%'
-    tags:
-      - { name: 'pim_repository' }
+    _defaults:
+        public: true
+
+    pim_powerling.repository.webapi:
+        class: '%pim_powerling.repository.webapi.class%'
+        arguments:
+            - '@oro_config.global'
+            - '%powerling.base_uri.app%'
+            -
+    pim_powerling.repository.project:
+        class: '%pim_powerling.repository.project.class%'
+        factory: 'doctrine.orm.entity_manager:getRepository'
+        arguments:
+            - '%pim_powerling.entity.project.class%'
+        tags:
+            - { name: 'pim_repository' }

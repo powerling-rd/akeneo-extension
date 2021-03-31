@@ -229,7 +229,7 @@ class BuilderSpec extends ObjectBehavior
             ->shouldReturn(null);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'returnThisArray' => function ($subject, $expected) {

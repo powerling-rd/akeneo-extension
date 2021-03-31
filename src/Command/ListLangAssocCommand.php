@@ -2,9 +2,10 @@
 
 namespace Pim\Bundle\PowerlingBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Pim\Bundle\PowerlingBundle\Api\WebApiRepositoryInterface;
 
 /**
  * Retrieve all Powerling lang assocs
@@ -12,10 +13,21 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author    Arnaud Lejosne <a.lejosne@powerling.com>
  * @copyright 2019 Powerling (https://powerling.com)
 */
-class ListLangAssocCommand extends ContainerAwareCommand
+class ListLangAssocCommand extends Command
 {
     /** @var OutputInterface */
     private $output;
+    
+    private $webApiRepository;
+
+    protected static $defaultName = 'pim:powerling:list-lang-assoc';
+
+    public function __construct(WebApiRepositoryInterface $webApiRepository)
+    {
+        parent::__construct();
+
+        $this->webApiRepository = $webApiRepository;
+    }
 
     /**
      * {@inheritdoc}
@@ -23,7 +35,7 @@ class ListLangAssocCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('pim:powerling:list-lang-assoc')
+            ->setName(self::$defaultName)
             ->setDescription('Fetch projects via Powerling API call');
     }
 
@@ -53,8 +65,7 @@ class ListLangAssocCommand extends ContainerAwareCommand
      */
     protected function getLangAssocs()
     {
-        $webApiRepository = $this->getContainer()->get('pim_powerling.repository.webapi');
-        $assocs = $webApiRepository->getLangAssociations();
+        $assocs = $this->webApiRepository->getLangAssociations();
 
         return $assocs;
     }

@@ -1,7 +1,9 @@
 services:
-  pim_powerling.saver.project:
-    class: '%akeneo_storage_utils.saver.base.class%'
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@event_dispatcher'
-      - '%pim_powerling.entity.project.class%'
+    _defaults:
+        public: true
+    pim_powerling.saver.project:
+        class: '%akeneo_storage_utils.saver.base.class%'
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@event_dispatcher'
+            - '%pim_powerling.entity.project.class%'

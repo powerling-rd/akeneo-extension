@@ -1,6 +1,6 @@
 # Powerling extension for Akeneo PIM
 
-[![Build Status](https://travis-ci.org/powerling-rd/akeneo-extension.svg?branch=3.2)](https://travis-ci.org/powerling-rd/akeneo-extension)
+[![Build Status](https://travis-ci.org/powerling-rd/akeneo-extension.svg?branch=4.0)](https://travis-ci.org/powerling-rd/akeneo-extension)
 
 ## Description
 
@@ -24,13 +24,18 @@ The translation request is done by a very simple mass edit process:
 
 First step is to require the sources:
 ```
-composer require powerling/akeneo-extension 3.2
+composer require powerling/akeneo-extension 4.0
 ```
 
-Register your bundle in the `AppKernel::registerProjectBundles`:
+Register the bundle in `config/bundles.php`:
 
 ```
-new \Pim\Bundle\PowerlingBundle\PimPowerlingBundle(),
+Pim\Bundle\PowerlingBundle\PimPowerlingBundle::class => ['all' => true],
+```
+
+Clear cache:
+```
+rm -rf var/cache && bin/console cache:warmup
 ```
 
 Then we need to add a new mass edit batch job:
@@ -39,7 +44,7 @@ Then we need to add a new mass edit batch job:
 bin/console akeneo:batch:create-job 'Powerling Connector' 'powerling_start_projects' "mass_edit" 'powerling_start_projects'
 ```
 
-Add the new routes used by the extension to the global router. Add the following lines at the end of `app/config/routing.yml`:
+Add the new routes used by the extension to the global router. Add the following lines at the end of `config/routes/routes.yml` (create the file if it does not exist):
 
 ```
 powerling:
@@ -49,13 +54,12 @@ powerling:
 Update the database schema and regenerate your cache and assets:
 
 ```
-rm -rf var/cache/* web/bundles/* web/js/* web/css/*
-bin/console doctrine:schema:update --force --env=prod 
-bin/console p:i:a --env=prod
-bin/console a:i --env=prod
-yarn run webpack
-find ./ -type d -exec chmod 755 {} \;
-find ./ -type f -exec chmod 644 {} \;
+bin/console doctrine:schema:update --force --env=prod
+rm -rf var/cache && bin/console cache:warmup
+rm -rf public/bundles public/js
+bin/console pim:installer:assets --symlink --clean
+rm -rf public/dist
+yarn run webpack (or yarnpkg run webpack)
 ```
 
 Finally, you must set a `cron` to retrieve the translated contents from Powerling:
@@ -79,7 +83,7 @@ In this screen you will be able to set:
 ### Sandbox
 
 When you install the extension, it aims at Powerling's sandbox environment.
-In order to make it aim at the production environment, add the following line to your parameters.yml file:
+In order to make it aim at the production environment, add the following line to your `config/services/services.yml` file:
 
 ```
 powerling.base_uri.app: 'https://api.powerling-tp.com'

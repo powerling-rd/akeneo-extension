@@ -105,7 +105,7 @@ class WebApiRepository implements WebApiRepositoryInterface
         $documentsToRetrieve = [];
         $documents = [];
 
-        foreach ($response['data'] as $projectFile) {
+        foreach ($response['data']['files'] as $projectFile) {
             if ($projectFile['status'] === 'complete') {
                 $documentsToRetrieve[] = $projectFile['id'];
             }
@@ -119,7 +119,7 @@ class WebApiRepository implements WebApiRepositoryInterface
             }
         }
 
-        return [$documents, count($response['data']) === count($documents)];
+        return [$documents, count($response['data']['files']) === count($documents)];
     }
 
     /**
