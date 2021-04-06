@@ -13,16 +13,16 @@
         }
     ],
     "require": {
-	"php": "7.3.*",
+	"php": "7.4.*",
         "ext-dom": "*",
         "ext-json": "*",
-        "guzzlehttp/guzzle": "^7.3"
+        "guzzlehttp/guzzle": "^6.5"
     },
     "require-dev": {
         "behat/behat": "3.*",
         "friendsofphp/php-cs-fixer": "2.*",
         "phpspec/phpspec": "6.*",
-        "akeneo/pim-community-dev": "4.0.*@stable"
+        "akeneo/pim-community-dev": "5.0.*@stable"
     },
     "autoload": {
         "psr-4": {

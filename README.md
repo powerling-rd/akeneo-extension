@@ -1,6 +1,6 @@
 # Powerling extension for Akeneo PIM
 
-[![Build Status](https://travis-ci.org/powerling-rd/akeneo-extension.svg?branch=4.0)](https://travis-ci.org/powerling-rd/akeneo-extension)
+[![Build Status](https://travis-ci.org/powerling-rd/akeneo-extension.svg?branch=5.0)](https://travis-ci.org/powerling-rd/akeneo-extension)
 
 ## Description
 
@@ -24,7 +24,7 @@ The translation request is done by a very simple mass edit process:
 
 First step is to require the sources:
 ```
-composer require powerling/akeneo-extension 4.0
+composer require powerling/akeneo-extension 5.0
 ```
 
 Register the bundle in `config/bundles.php`:
@@ -55,11 +55,11 @@ Update the database schema and regenerate your cache and assets:
 
 ```
 bin/console doctrine:schema:update --force --env=prod
-rm -rf var/cache && bin/console cache:warmup
-rm -rf public/bundles public/js
-bin/console pim:installer:assets --symlink --clean
-rm -rf public/dist
-yarn run webpack (or yarnpkg run webpack)
+NO_DOCKER=true make cache
+NO_DOCKER=true make assets
+NO_DOCKER=true make javascript-extensions
+NO_DOCKER=true make css
+NO_DOCKER=true make javascript-prod
 ```
 
 Finally, you must set a `cron` to retrieve the translated contents from Powerling:
